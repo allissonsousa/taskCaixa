@@ -10,13 +10,27 @@
         .pending { color: black; }
         .saldo-positive { color: green; }
         .saldo-negative { color: red; }
+        
+        /* Ajustes específicos para impressão */
+        @media print {
+            /* Garante que o fundo das linhas da tabela apareça na impressão */
+            .table-striped>tbody>tr:nth-of-type(odd)>* {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            /* Esconde elementos desnecessários na impressão (redundância ao d-print-none) */
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body>
-    <img src="logo.jpeg" width="200px"  class="mx-auto d-block rounded-circle mt-5"  alt="Logo">
-    <div class="container mt-5">
-        <h1 class="text-center mb-5" style="color: rgb(0, 102, 255);">Studio Vieira Papelaria</h1>
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <div class="text-center mt-4">
+        <img src="logo.jpeg" width="150px" class="rounded-circle" alt="Logo" onerror="this.style.display='none'"> 
+        <h1 class="mt-2" style="color: rgb(0, 102, 255);">Studio Vieira Papelaria</h1>
+    </div>
+
+    <div class="container mt-4">
+        <ul class="nav nav-tabs d-print-none" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="tasks-tab" data-bs-toggle="tab" data-bs-target="#tasks" type="button" role="tab">Gestão de Serviços</button>
             </li>
@@ -24,56 +38,74 @@
                 <button class="nav-link" id="movements-tab" data-bs-toggle="tab" data-bs-target="#movements" type="button" role="tab">Controle de Caixa</button>
             </li>
         </ul>
+
         <div class="tab-content" id="myTabContent">
-            <!-- Aba 1: Gestão de Serviços -->
+            
             <div class="tab-pane fade show active" id="tasks" role="tabpanel">
-                <h3 class="mt-3">Adicionar Nova Tarefa</h3>
-                <form id="taskForm">
-                    <div class="mb-3">
-                        <label for="cliente" class="form-label">Nome do Cliente</label>
-                        <input type="text" class="form-control" id="cliente" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="descricao" class="form-label">Descrição do Serviço</label>
-                        <textarea class="form-control" id="descricao" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="valor" class="form-label">Valor (R$)</label>
-                        <input type="number" step="0.01" class="form-control" id="valor" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="prazo" class="form-label">Prazo de Entrega (YYYY-MM-DD)</label>
-                        <input type="date" class="form-control" id="prazo" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
-                </form>
-                <h3 class="mt-4">Lista de Tarefas</h3>
-                <ul id="taskList" class="list-group"></ul>
+                
+                <div class="card p-3 mt-3 bg-light d-print-none">
+                    <h5>Adicionar Nova Tarefa</h5>
+                    <form id="taskForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label for="cliente" class="form-label">Nome do Cliente</label>
+                                <input type="text" class="form-control" id="cliente" required>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label for="valor" class="form-label">Valor (R$)</label>
+                                <input type="number" step="0.01" class="form-control" id="valor" required>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label for="prazo" class="form-label">Prazo</label>
+                                <input type="date" class="form-control" id="prazo" required>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <label for="descricao" class="form-label">Descrição</label>
+                                <input type="text" class="form-control" id="descricao" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-2">Salvar Tarefa</button>
+                    </form>
+                </div>
+
+                <h3 class="mt-4 border-bottom pb-2">Relatório de Serviços</h3>
+                <ul id="taskList" class="list-group mt-3"></ul>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 mb-5 d-print-none">
+                    <button class="btn btn-outline-secondary" onclick="window.print()">🖨️ Imprimir Relatório de Tarefas</button>
+                    <button class="btn btn-outline-danger" onclick="clearAllTasks()">🗑️ Excluir Todas as Tarefas</button>
+                </div>
             </div>
-            <!-- Aba 2: Controle de Caixa -->
+
             <div class="tab-pane fade" id="movements" role="tabpanel">
-                <h3 class="mt-3">Adicionar Movimentação</h3>
-                <form id="movementForm">
-                    <div class="mb-3">
-                        <label for="motivo" class="form-label">Motivo</label>
-                        <input type="text" class="form-control" id="motivo" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="valorMov" class="form-label">Valor (R$)</label>
-                        <input type="number" step="0.01" class="form-control" id="valorMov" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="tipo" class="form-label">Tipo</label>
-                        <select class="form-select" id="tipo" required>
-                            <option value="entrada">Entrada</option>
-                            <option value="saida">Saída</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Movimentação</button>
-                </form>
-                <h3 class="mt-4">Lista de Movimentações</h3>
-                <table class="table table-striped">
-                    <thead>
+                
+                <div class="card p-3 mt-3 bg-light d-print-none">
+                    <h5>Adicionar Movimentação</h5>
+                    <form id="movementForm">
+                        <div class="row">
+                            <div class="col-md-5 mb-2">
+                                <label for="motivo" class="form-label">Motivo</label>
+                                <input type="text" class="form-control" id="motivo" required>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label for="valorMov" class="form-label">Valor (R$)</label>
+                                <input type="number" step="0.01" class="form-control" id="valorMov" required>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label for="tipo" class="form-label">Tipo</label>
+                                <select class="form-select" id="tipo" required>
+                                    <option value="entrada">Entrada (+)</option>
+                                    <option value="saida">Saída (-)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success mt-2">Lançar no Caixa</button>
+                    </form>
+                </div>
+
+                <h3 class="mt-4 border-bottom pb-2">Fluxo de Caixa</h3>
+                <table class="table table-striped mt-3">
+                    <thead class="table-dark">
                         <tr>
                             <th>Motivo</th>
                             <th>Valor</th>
@@ -83,48 +115,54 @@
                     </thead>
                     <tbody id="movementTable"></tbody>
                     <tfoot>
-                        <tr>
-                            <td colspan="3"><strong>Saldo Total:</strong></td>
+                        <tr class="table-secondary">
+                            <td colspan="3" class="text-end"><strong>Saldo Total:</strong></td>
                             <td id="saldo" class="fw-bold"></td>
                         </tr>
                     </tfoot>
                 </table>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 mb-5 d-print-none">
+                    <button class="btn btn-outline-secondary" onclick="window.print()">🖨️ Imprimir Relatório de Caixa</button>
+                    <button class="btn btn-outline-danger" onclick="clearAllMovements()">🗑️ Excluir Todo o Caixa</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Funções utilitárias para localStorage
-        function getTasks() {
-            return JSON.parse(localStorage.getItem('tasks') || '[]');
-        }
+        // === FUNÇÕES UTILITÁRIAS (LocalStorage) ===
+        function getTasks() { return JSON.parse(localStorage.getItem('tasks') || '[]'); }
+        function saveTasks(tasks) { localStorage.setItem('tasks', JSON.stringify(tasks)); }
+        
+        function getMovements() { return JSON.parse(localStorage.getItem('movements') || '[]'); }
+        function saveMovements(movements) { localStorage.setItem('movements', JSON.stringify(movements)); }
 
-        function saveTasks(tasks) {
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-        }
-
-        function getMovements() {
-            return JSON.parse(localStorage.getItem('movements') || '[]');
-        }
-
-        function saveMovements(movements) {
-            localStorage.setItem('movements', JSON.stringify(movements));
-        }
-
-        // Funções para Tarefas
+        // === LÓGICA DE TAREFAS ===
         function loadTasks() {
             const tasks = getTasks();
             const taskList = document.getElementById('taskList');
             taskList.innerHTML = '';
+            
+            if(tasks.length === 0) {
+                taskList.innerHTML = '<li class="list-group-item text-center text-muted">Nenhuma tarefa cadastrada.</li>';
+                return;
+            }
+
             tasks.forEach((task, index) => {
                 const li = document.createElement('li');
                 li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                // Adiciona formatação para impressão
                 li.innerHTML = `
                     <div class="${task.concluida ? 'completed' : 'pending'}">
-                        <strong>${task.cliente}</strong> - ${task.descricao} - R$ ${task.valor} - Prazo: ${task.prazo}
+                        <strong>${task.cliente}</strong> <br>
+                        <small>${task.descricao} | Entrega: ${formatDate(task.prazo)} | R$ ${task.valor.toFixed(2)}</small>
                     </div>
-                    <input type="checkbox" ${task.concluida ? 'checked' : ''} onchange="toggleTask(${index}, this.checked)">
+                    <input type="checkbox" class="form-check-input ms-2 d-print-none" 
+                           ${task.concluida ? 'checked' : ''} 
+                           onchange="toggleTask(${index}, this.checked)">
+                    <span class="d-none d-print-inline fw-bold">${task.concluida ? '(Concluído)' : '(Pendente)'}</span>
                 `;
                 taskList.appendChild(li);
             });
@@ -137,11 +175,20 @@
             loadTasks();
         }
 
+        // Nova Função: Excluir Todas as Tarefas
+        function clearAllTasks() {
+            if (confirm("Tem certeza que deseja apagar TODO o histórico de tarefas? Essa ação não pode ser desfeita.")) {
+                localStorage.removeItem('tasks');
+                loadTasks();
+                alert("Tarefas excluídas com sucesso!");
+            }
+        }
+
         document.getElementById('taskForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const tasks = getTasks();
             const newTask = {
-                id: Date.now(), // Simula ID único
+                id: Date.now(),
                 cliente: document.getElementById('cliente').value,
                 descricao: document.getElementById('descricao').value,
                 valor: parseFloat(document.getElementById('valor').value),
@@ -154,38 +201,61 @@
             loadTasks();
         });
 
-        // Funções para Movimentações
+        // === LÓGICA DE MOVIMENTAÇÕES ===
         function loadMovements() {
             const movements = getMovements();
             const movementTable = document.getElementById('movementTable');
             movementTable.innerHTML = '';
+
+            if(movements.length === 0) {
+                movementTable.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Nenhuma movimentação registrada.</td></tr>';
+                document.getElementById('saldo').textContent = 'R$ 0.00';
+                return;
+            }
+
             movements.forEach(mov => {
                 const tr = document.createElement('tr');
+                const tipoTexto = mov.tipo === 'entrada' ? '<span class="text-success">Entrada</span>' : '<span class="text-danger">Saída</span>';
+                
                 tr.innerHTML = `
                     <td>${mov.motivo}</td>
-                    <td>R$ ${mov.valor}</td>
-                    <td>${mov.data_inclusao}</td>
-                    <td>${mov.tipo}</td>
+                    <td>R$ ${mov.valor.toFixed(2)}</td>
+                    <td>${mov.data_exibicao}</td>
+                    <td>${tipoTexto}</td>
                 `;
                 movementTable.appendChild(tr);
             });
+
             // Calcular saldo
             const entradas = movements.filter(m => m.tipo === 'entrada').reduce((sum, m) => sum + m.valor, 0);
             const saidas = movements.filter(m => m.tipo === 'saida').reduce((sum, m) => sum + m.valor, 0);
             const saldo = entradas - saidas;
+            
             const saldoEl = document.getElementById('saldo');
             saldoEl.textContent = `R$ ${saldo.toFixed(2)}`;
-            saldoEl.className = saldo >= 0 ? 'saldo-positive' : 'saldo-negative';
+            saldoEl.className = `fw-bold ${saldo >= 0 ? 'saldo-positive' : 'saldo-negative'}`;
+        }
+
+        // Nova Função: Excluir Todas as Movimentações
+        function clearAllMovements() {
+            if (confirm("Tem certeza que deseja apagar TODO o fluxo de caixa? O saldo será zerado.")) {
+                localStorage.removeItem('movements');
+                loadMovements();
+                alert("Fluxo de caixa limpo com sucesso!");
+            }
         }
 
         document.getElementById('movementForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const movements = getMovements();
+            const hoje = new Date();
+            
             const newMovement = {
-                id: Date.now(), // Simula ID único
+                id: Date.now(),
                 motivo: document.getElementById('motivo').value,
                 valor: parseFloat(document.getElementById('valorMov').value),
-                data_inclusao: new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0], // Data atual
+                // Salva formatado para exibição bonita
+                data_exibicao: hoje.toLocaleDateString('pt-BR') + ' ' + hoje.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}),
                 tipo: document.getElementById('tipo').value
             };
             movements.push(newMovement);
@@ -194,7 +264,14 @@
             loadMovements();
         });
 
-        // Carregar dados iniciais
+        // Auxiliar para formatar data do input type date (yyyy-mm-dd) para pt-BR
+        function formatDate(dateString) {
+            if(!dateString) return '';
+            const [year, month, day] = dateString.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        // Carregar dados ao iniciar
         loadTasks();
         loadMovements();
     </script>
